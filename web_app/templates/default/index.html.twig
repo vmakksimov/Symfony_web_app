@@ -14,8 +14,12 @@
     {% for user in users %}
     <li>
     {{ user.name }}
+    received
     </li>
 
+    {%endfor%}
+    {% for gift in gifts %}
+    {{ gift }}
     {%endfor%}
 
     This friendly message is coming from:
