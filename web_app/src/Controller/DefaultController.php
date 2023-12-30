@@ -21,7 +21,7 @@ use Symfony\Component\HttpFoundation\Session\SessionInterface;
 
 class DefaultController extends AbstractController
 {
-    #[Route('/defaultf/{page?}', name: 'app_default', requirements: ['page' => '\d+'])]
+    #[Route('/default/{page?}', name: 'app_default', requirements: ['page' => '\d+'])]
 
 
     public function index(
@@ -38,13 +38,15 @@ class DefaultController extends AbstractController
         // $entityManager->persist($user);
         // $entityManager->flush();
 
-
+        $as = $entityManager->getRepository(User::class)->find(1);
         $users = $doctrine->getManager()->getRepository(User::class)->findAll();
-        $session->set('name', 'session value');
-        $session->clear();
-        if ($session->has('name')) {
-            exit($session->get('name'));
-        }
+        $user = $doctrine->getManager()->getRepository(User::class)->find(1);
+        dump($as);
+        // $session->set('name', 'session value');
+        // $session->clear();
+        // if ($session->has('name')) {
+        //     exit($session->get('name'));
+        // }
         // exit($request->cookies->get('PHPSESSID'));
         // $cookie = new Cookie(
         //     'bounty',
