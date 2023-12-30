@@ -16,7 +16,9 @@ class AppFixtures extends Fixture
         for ($i = 0; $i <= 5; $i++) {
             # code...
             $user = new User();
-            $user->setName('name - ' . $i);
+
+
+            $user->setName('name - Viktor' . $i);
             $manager->persist($user);
         }
 
