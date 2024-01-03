@@ -6,23 +6,14 @@ use App\Repository\PdfRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: PdfRepository::class)]
-class Pdf
+class Pdf extends File
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
-
+    
     #[ORM\Column]
     private ?int $pages_number = null;
 
     #[ORM\Column(length: 255)]
     private ?string $orientation = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getPagesNumber(): ?int
     {

@@ -4,9 +4,15 @@ namespace App\Entity;
 
 use App\Repository\FileRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\ORM\Mapping\InheritanceType;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
-class File
+
+#[ORM\InheritanceType('SINGLE_TABLE')]
+#[ORM\DiscriminatorColumn(name:'type', type:'string')]
+#[ORM\DiscriminatorMap(['video' => 'Video', 'pdf' => 'Pdf'])]
+
+abstract class File
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]

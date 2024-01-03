@@ -6,12 +6,9 @@ use App\Repository\VideoRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: VideoRepository::class)]
-class Video
+class Video extends File
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+
 
     #[ORM\Column(length: 255)]
     private ?string $title = null;
@@ -25,11 +22,6 @@ class Video
 
     #[ORM\Column]
     private ?int $duration = null;
-
-    public function getId(): ?int
-    {
-        return $this->id;
-    }
 
     public function getTitle(): ?string
     {
