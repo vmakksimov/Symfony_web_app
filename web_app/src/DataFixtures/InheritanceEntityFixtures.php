@@ -33,7 +33,7 @@ class InheritanceEntityFixtures extends Fixture
                 $video = new Video;
                 $video->setTitle('Title of video - ' . $i);
                 $video->setDuration('Duration of video -' . $i);
-              
+                $video->getDescription();
             }
         }
 
