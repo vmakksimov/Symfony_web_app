@@ -10,7 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\{User, Video, Address};
+use App\Entity\{User, Video, Address, Author, File, Pdf};
+use App\Services\MyService;
 use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
@@ -29,7 +30,8 @@ class DefaultController extends AbstractController
         PersistenceManagerRegistry $doctrine,
         GiftService $gifts,
         Request $request,
-        SessionInterface $session
+        SessionInterface $session,
+        MyService $myService
     ): Response {
 
         // $user = new User();
@@ -37,30 +39,36 @@ class DefaultController extends AbstractController
 
         // $entityManager->persist($user);
         // $entityManager->flush();
-
-        $user = new User();
-        $user->setName('Viktor');
-        $entityManager->persist($user);
-        $entityManager->flush();
-
-        $as = $entityManager->getRepository(User::class)->find(1);
-        $users = $doctrine->getManager()->getRepository(User::class)->findAll();
-        // $user = $doctrine->getManager()->getRepository(User::class)->find(1);
-        dump($as);
-
-        $video = new Video();
-
-        for ($i=0; $i <= 5 ; $i++) { 
-            $video->setTitle('Video number -' . $i);
-            $user->addVideo($video);
-            $entityManager->persist($video);
+        dump($myService->secService->someMethod());
+        $author = $entityManager->getRepository(Author::class)->findByIdWithPdf(1);
+        dump($author);
+        foreach($author->getFiles() as $file){
+            dump($file->getFilename());
         }
 
-       $address = new Address();
-       $address->setStreet('501');
-       $address->setNumber(1);
-       $user->setAddress($address);
-       $entityManager->flush();
+        // $user = new User();
+        // $user->setName('Viktor');
+        // $entityManager->persist($user);
+        // $entityManager->flush();
+
+        // $as = $entityManager->getRepository(User::class)->find(1);
+        $users = $doctrine->getManager()->getRepository(User::class)->findAll();
+        // $user = $doctrine->getManager()->getRepository(User::class)->find(1);
+      
+
+    //     $video = new Video();
+
+    //     for ($i=0; $i <= 5 ; $i++) { 
+    //         $video->setTitle('Video number -' . $i);
+    //         $user->addVideo($video);
+    //         $entityManager->persist($video);
+    //     }
+
+    //    $address = new Address();
+    //    $address->setStreet('501');
+    //    $address->setNumber(1);
+    //    $user->setAddress($address);
+    //    $entityManager->flush();
         
         // $session->set('name', 'session value');
         // $session->clear();

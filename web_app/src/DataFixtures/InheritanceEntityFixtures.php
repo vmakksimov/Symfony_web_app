@@ -31,9 +31,13 @@ class InheritanceEntityFixtures extends Fixture
             for ($k=1; $k <=3 ; $k++) { 
                 # code...
                 $video = new Video;
-                $video->setTitle('Title of video - ' . $i);
-                $video->setDuration('Duration of video -' . $i);
-                1
+                $video->setFilename('Filename of video - ' . $i);
+                $video->setDescription('Description of video -' .$i);
+                $video->setSize(321);
+                $video->setFormat('mpeg-2');
+                $video->setDuration(123);
+                $video->setAuthor($author);
+                $manager->persist($video);
             }
         }
 
