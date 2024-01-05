@@ -30,8 +30,11 @@ services:
             # $param: 'some parameter'
             # $adminEmail: '%admin_email%'
             # $second_service: '@App\Services\MySecondService'
-    App\Services\MySecondService:
-        lazy: true
+    App\Listeners\VideoCreatedListener:
+        tags:
+            - {name: kernel.event_listener, event: video.created.event, method: onVideoCreatedEvent}
+    # App\Services\MySecondService:
+    #     lazy: true
     # App\Controller\DefaultController:
     #     bind:
     #         $logger: '@monolog.logger.doctrine'

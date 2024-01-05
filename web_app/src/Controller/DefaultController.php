@@ -11,27 +11,35 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
 use App\Entity\{User, Video, Address, Author, File, Pdf};
+use App\Events\VideoCreatedEvent;
 use App\Services\MyService;
 use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
+Use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use App\Form\VideoFormType;
 
 
 
 class DefaultController extends AbstractController
 {
+    
+
+    public $dispatcher;
+    public function __construct(EventDispatcherInterface $dispatcher){
+        $this->dispatcher = $dispatcher;
+    
+    }
     #[Route('/default', name: 'app_default', requirements: ['page' => '\d+'])]
-
-
     public function index(
         EntityManagerInterface $entityManager, 
         PersistenceManagerRegistry $doctrine,
         GiftService $gifts,
         Request $request,
         SessionInterface $session,
-        MyService $myService
+        MyService $myService,
     ): Response {
 
         // $user = new User();
@@ -39,12 +47,16 @@ class DefaultController extends AbstractController
 
         // $entityManager->persist($user);
         // $entityManager->flush();
-        dump($myService->secService->someMethod());
-        $author = $entityManager->getRepository(Author::class)->findByIdWithPdf(1);
-        dump($author);
-        foreach($author->getFiles() as $file){
-            dump($file->getFilename());
-        }
+        // $video = new \stdClass();
+        // $video->title = 'Funny Movie';
+        // $event = new VideoCreatedEvent($video);
+        // $this->dispatcher->dispatch($event, 'video.created.event');
+        // dump($myService->secService->someMethod());
+        // $author = $entityManager->getRepository(Author::class)->findByIdWithPdf(1);
+        // dump($author);
+        // foreach($author->getFiles() as $file){
+        //     dump($file->getFilename());
+        // }
 
         // $user = new User();
         // $user->setName('Viktor');
@@ -52,11 +64,11 @@ class DefaultController extends AbstractController
         // $entityManager->flush();
 
         // $as = $entityManager->getRepository(User::class)->find(1);
-        $users = $doctrine->getManager()->getRepository(User::class)->findAll();
+        
         // $user = $doctrine->getManager()->getRepository(User::class)->find(1);
       
 
-    //     $video = new Video();
+        
 
     //     for ($i=0; $i <= 5 ; $i++) { 
     //         $video->setTitle('Video number -' . $i);
@@ -85,8 +97,18 @@ class DefaultController extends AbstractController
         // $res = new Response();
         // $res->headers->setCookie($cookie);
         // $res->send();
+        $video = new Video();
+        $video->setTitle('Create a blog post');
+        $video->setCreatedAt(new \DateTime('tomorrow'));
+        $form = $this->createForm(VideoFormType::class, $video);
+        $form->handleRequest($request);
+        if($form->isSubmitted() && $form->isValid()){
+            $entityManager->persist($video);
+            $entityManager->flush();
+            return $this->redirectToRoute('app_default');
+        }
 
-
+        $users = $doctrine->getManager()->getRepository(User::class)->findAll();
         $usera = ['Adam', 'Philly', 'Asen'];
 
         if (!$users) {
@@ -95,7 +117,8 @@ class DefaultController extends AbstractController
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
             'users' => $users,
-            'gifts' => $gifts->gifts
+            'gifts' => $gifts->gifts,
+            'form' => $form->createView(),
         ]);
         // return $this->redirectToRoute('app_default2');
     }
