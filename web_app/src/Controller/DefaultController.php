@@ -10,8 +10,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\Routing\Annotation\Route;
-use App\Entity\{User, Video, Address, Author, File, Pdf};
+use App\Entity\{User, Video, Address, Author, File, Pdf, SecurityUser};
 use App\Events\VideoCreatedEvent;
+use App\Form\RegisterUserType;
 use App\Services\MyService;
 use Doctrine\Persistence\ManagerRegistry as PersistenceManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,6 +21,9 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\SessionInterface;
 Use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use App\Form\VideoFormType;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
+
 
 
 
@@ -40,6 +44,7 @@ class DefaultController extends AbstractController
         Request $request,
         SessionInterface $session,
         MyService $myService,
+        UserPasswordHasherInterface $userPasswordHasherInterface
     ): Response {
 
         // $user = new User();
@@ -97,23 +102,37 @@ class DefaultController extends AbstractController
         // $res = new Response();
         // $res->headers->setCookie($cookie);
         // $res->send();
-        $video = new Video();
-        $video->setTitle('Create a blog post');
-        $video->setCreatedAt(new \DateTime('tomorrow'));
-        $form = $this->createForm(VideoFormType::class, $video);
+        // $video = new Video();
+        // $video->setTitle('Create a blog post');
+        // $video->setCreatedAt(new \DateTime('tomorrow'));
+        // $form = $this->createForm(VideoFormType::class, $video);
+        // $form->handleRequest($request);
+        // if($form->isSubmitted() && $form->isValid()){
+        //     $entityManager->persist($video);
+        //     $entityManager->flush();
+        //     return $this->redirectToRoute('app_default');
+        // }
+
+        $users = $doctrine->getManager()->getRepository(SecurityUser::class)->findAll();
+        dump($users);
+        $usera = ['Adam', 'Philly', 'Asen'];
+
+        $user = new SecurityUser();
+        $form = $this->createForm(RegisterUserType::class, $user);
         $form->handleRequest($request);
+        $passwordFile = $form->get('password')->getData();
+        dump($passwordFile);
         if($form->isSubmitted() && $form->isValid()){
-            $entityManager->persist($video);
+            $user->setPassword($userPasswordHasherInterface->hashPassword($user, $passwordFile));
+            $user->setEmail($form->get('email')->getData());
+            $entityManager->persist($user);
             $entityManager->flush();
             return $this->redirectToRoute('app_default');
         }
 
-        $users = $doctrine->getManager()->getRepository(User::class)->findAll();
-        $usera = ['Adam', 'Philly', 'Asen'];
-
-        if (!$users) {
-            throw $this->createNotFoundException('The user does not exists');
-        }
+        // if (!$users) {
+        //     throw $this->createNotFoundException('The user does not exists');
+        // }
         return $this->render('default/index.html.twig', [
             'controller_name' => 'DefaultController',
             'users' => $users,
@@ -135,5 +154,16 @@ class DefaultController extends AbstractController
     {
         $path = $this->getParameter('download_directory');
         return $this->file($path . 'file1.png');
+    }
+    #[Route("/login", name: "login")]
+    public function login(AuthenticationUtils $authenticationUtils){
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUserName = $authenticationUtils->getLastUsername();
+
+        return $this->render('security/login.html.twig', array(
+            'last_username' => $lastUserName,
+            'error' => $error,
+       
+        ));
     }
 }
